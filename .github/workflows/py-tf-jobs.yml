@@ -80,5 +80,8 @@ jobs:
           cd src
           terraform apply --auto-approve
 
+      - name: terraform destroying
+        run: terraform destroy --auto-approve
+
 
 
