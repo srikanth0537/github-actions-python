@@ -1,0 +1,75 @@
+name: Terraform & Python jobs
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  python_job:
+    name: This is python job
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8" ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      # You can test your matrix by printing the current Python version
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+        
+      - name: Install dependancies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Run tests
+        run: |
+          cd src
+          python -m pytest app.py
+
+  terraform_job:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        terraform-version: ["1.4.5" ]
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform-version: ${{ matrix.terraform-version }}
+      
+      - name: terraform Initializing
+        run: |
+          cd src
+          terraform init
+      
+      - name: terraform Validating
+        run: |
+          cd src
+          terraform validate
+
+      - name: terraform planning
+        run: |
+          cd src
+          terraform plan
+
+      - name: terraform Applying
+        if: contains(github.events.head_commit.message, 'terraform') || contains(github.events.head_commit.message, 'terraform_job')
+        run: |
+          cd src
+          terraform apply --auto-approve
+
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+
