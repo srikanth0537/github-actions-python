@@ -1,11 +1,4 @@
 provider "aws" {
-    region = "us-east-1"
-    alias = "us-east-1"
-  
-}
-
-provider "aws" {
-    alias = "ap-south-1"
     region = "ap-south-1"
   
 }
@@ -22,7 +15,7 @@ terraform {
 resource "aws_instance" "ec2-instance" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  provider = aws.ap-south-1
+  provider = "ap-south-1"
 
   tags = {
     "Name" = "tf-github-actions-server"
