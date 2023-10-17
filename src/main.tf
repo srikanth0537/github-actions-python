@@ -15,7 +15,6 @@ terraform {
 resource "aws_instance" "ec2-instance" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  provider = "ap-south-1"
 
   tags = {
     "Name" = "tf-github-actions-server"
